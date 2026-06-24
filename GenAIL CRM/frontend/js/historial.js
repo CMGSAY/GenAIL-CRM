@@ -49,40 +49,104 @@ document.addEventListener('DOMContentLoaded', () => {
         allClientes.forEach(c => {
           clientesMap[c._id] = c;
         });
-        renderSelector(allClientes);
+        // Rellenar el selector original oculto para mantener compatibilidad total
+        if (selectCliente) {
+          selectCliente.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
+          allClientes.forEach(c => {
+            const option = document.createElement('option');
+            option.value = c._id;
+            option.textContent = `${c.nombre} ${c.apellidos}`;
+            selectCliente.appendChild(option);
+          });
+        }
       }
     } catch (err) {
       window.showToast('Error al cargar la lista de clientes', 'error');
     }
   }
 
-  function renderSelector(lista) {
-    if (!selectCliente) return;
-    selectCliente.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
-    lista.forEach(c => {
-      const option = document.createElement('option');
-      option.value = c._id;
-      const correoText = c.correo ? ` - ${c.correo}` : '';
-      option.textContent = `${c.nombre} ${c.apellidos} (${c.empresa || 'Particular'})${correoText}`;
-      selectCliente.appendChild(option);
-    });
-  }
-
-  // --- Buscador y Filtro Local ---
+  // --- Buscador y Sugerencias de Autocompletado ---
   const buscarClienteInput = document.getElementById('buscar-cliente-input');
+  const suggestionsContainer = document.getElementById('autocomplete-suggestions');
+
   buscarClienteInput?.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
     if (!query) {
-      renderSelector(allClientes);
+      ocultarSugerencias();
       return;
     }
+
     const filtered = allClientes.filter(c => {
       const nombreCompleto = `${c.nombre} ${c.apellidos}`.toLowerCase();
       const correo = (c.correo || '').toLowerCase();
       const empresa = (c.empresa || '').toLowerCase();
       return nombreCompleto.includes(query) || correo.includes(query) || empresa.includes(query);
     });
-    renderSelector(filtered);
+
+    renderSugerencias(filtered);
+  });
+
+  function renderSugerencias(lista) {
+    if (!suggestionsContainer) return;
+    
+    if (lista.length === 0) {
+      suggestionsContainer.innerHTML = '<div style="padding: var(--space-3) var(--space-4); color: var(--text-tertiary); font-size: var(--font-size-xs);">No se encontraron clientes</div>';
+      suggestionsContainer.style.display = 'block';
+      return;
+    }
+
+    suggestionsContainer.innerHTML = '';
+    lista.forEach(c => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-suggestion-item';
+      
+      const empresaText = c.empresa ? ` · ${c.empresa}` : '';
+      const correoText = c.correo ? ` · ${c.correo}` : '';
+
+      item.innerHTML = `
+        <div class="autocomplete-suggestion-name">${c.nombre} ${c.apellidos}</div>
+        <div class="autocomplete-suggestion-meta">Particular${empresaText}${correoText}</div>
+      `;
+
+      item.addEventListener('click', () => {
+        // Al seleccionar un cliente de la sugerencia:
+        buscarClienteInput.value = `${c.nombre} ${c.apellidos} (${c.empresa || 'Particular'})`;
+        ocultarSugerencias();
+
+        // Actualizar el selector original oculto y disparar evento de cambio
+        if (selectCliente) {
+          selectCliente.value = c._id;
+          selectCliente.dispatchEvent(new Event('change'));
+        }
+      });
+
+      suggestionsContainer.appendChild(item);
+    });
+
+    suggestionsContainer.style.display = 'block';
+  }
+
+  function ocultarSugerencias() {
+    if (suggestionsContainer) {
+      suggestionsContainer.style.display = 'none';
+    }
+  }
+
+  // Cerrar sugerencias al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (suggestionsContainer && !suggestionsContainer.contains(e.target) && e.target !== buscarClienteInput) {
+      ocultarSugerencias();
+    }
+  });
+
+  // Si el usuario vacía el input de búsqueda, resetear la vista y la selección
+  buscarClienteInput?.addEventListener('input', (e) => {
+    if (!e.target.value.trim()) {
+      if (selectCliente) {
+        selectCliente.value = '';
+        selectCliente.dispatchEvent(new Event('change'));
+      }
+    }
   });
 
   // --- Cambio de Cliente Seleccionado ---

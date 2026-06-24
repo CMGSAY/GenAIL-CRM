@@ -8,6 +8,46 @@
   <!-- Estilos del Sistema -->
   <link rel="stylesheet" href="../css/global.css">
   <link rel="stylesheet" href="../css/components.css">
+  
+  <style>
+    .autocomplete-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      max-height: 250px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+    .autocomplete-suggestion-item {
+      padding: var(--space-3) var(--space-4);
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .autocomplete-suggestion-item:last-child {
+      border-bottom: none;
+    }
+    .autocomplete-suggestion-item:hover {
+      background: rgba(99, 102, 241, 0.05);
+    }
+    .autocomplete-suggestion-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: var(--font-size-sm);
+    }
+    .autocomplete-suggestion-meta {
+      font-size: var(--font-size-xs);
+      color: var(--text-tertiary);
+    }
+  </style>
 </head>
 <body>
 
@@ -39,20 +79,16 @@
         </div>
 
         <!-- Selector de Cliente -->
-        <div class="card" style="margin-bottom: var(--space-6);">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="buscar-cliente-input">Buscar Cliente (Nombre, Correo o Empresa)</label>
-              <input type="text" id="buscar-cliente-input" class="form-control" placeholder="Escribe para filtrar la lista...">
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="select-cliente">Seleccionar Cliente para Consultar</label>
-              <select id="select-cliente" class="form-control">
-                <option value="">-- Seleccione un cliente --</option>
-                <!-- Rellenado por JS -->
-              </select>
-            </div>
+        <div class="card" style="margin-bottom: var(--space-6); position: relative;">
+          <div class="form-group" style="margin-bottom: 0; position: relative;">
+            <label class="form-label" for="buscar-cliente-input">Buscar Cliente (Nombre, Correo o Empresa)</label>
+            <input type="text" id="buscar-cliente-input" class="form-control" placeholder="Escribe el nombre, correo o empresa del cliente..." autocomplete="off">
+            <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
           </div>
+          <!-- Selector original oculto para mantener compatibilidad con JS -->
+          <select id="select-cliente" style="display: none;">
+            <option value="">-- Seleccione un cliente --</option>
+          </select>
         </div>
 
         <!-- Ficha de Resumen del Cliente (Visible solo al seleccionar cliente) -->
