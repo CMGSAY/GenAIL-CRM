@@ -241,7 +241,7 @@ async function updateNotificationCount() {
 
     // fetch a endpoint /api/notificaciones/count (que se implementará en sprint 9)
     // Para no romper en fases previas, manejamos errores con gracia
-    const res = await fetch('/api/notificaciones/count', {
+    const res = await fetch(`${window.CONFIG.API_BASE_URL}/notificaciones/count`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
@@ -311,7 +311,7 @@ async function cargarNotificacionesTray() {
     body.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: var(--space-6); font-size: var(--font-size-xs);">Cargando...</div>';
     
     const token = localStorage.getItem('genail_token');
-    const res = await fetch('/api/notificaciones', {
+    const res = await fetch(`${window.CONFIG.API_BASE_URL}/notificaciones`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
 
@@ -375,7 +375,7 @@ async function cargarNotificacionesTray() {
 async function marcarNotifLeida(id) {
   try {
     const token = localStorage.getItem('genail_token');
-    const res = await fetch(`/api/notificaciones/${id}/leer`, {
+    const res = await fetch(`${window.CONFIG.API_BASE_URL}/notificaciones/${id}/leer`, {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -394,7 +394,7 @@ async function marcarNotifLeida(id) {
 async function marcarTodasNotifLeidas() {
   try {
     const token = localStorage.getItem('genail_token');
-    const res = await fetch('/api/notificaciones/leer-todas', {
+    const res = await fetch(`${window.CONFIG.API_BASE_URL}/notificaciones/leer-todas`, {
       method: 'PATCH',
       headers: { 'Authorization': `Bearer ${token}` }
     });
