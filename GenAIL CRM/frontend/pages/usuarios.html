@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Usuarios — GenAIL CRM</title>
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+  <!-- Layout del Sistema -->
+  <div class="app-layout">
+    
+    <!-- Sidebar inyectado dinámicamente -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-wrapper">
+      
+      <!-- Header inyectado dinámicamente -->
+      <div id="header-container"></div>
+
+      <!-- Contenido Principal -->
+      <main class="main-content">
+        
+        <!-- Header de la sección -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1>Usuarios del Sistema</h1>
+            <p>Controla los accesos de tus empleados, asigna roles y suspende cuentas inactivas.</p>
+          </div>
+          <div>
+            <button id="btn-nuevo-usuario" class="btn btn-primary">
+              <span>👥</span> Agregar Usuario
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla de Usuarios -->
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Correo Electrónico</th>
+                <th>Rol</th>
+                <th>Último Acceso</th>
+                <th>Estado</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usuarios-table-body">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-tertiary); padding: var(--space-8);">
+                  Cargando usuarios...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </main>
+
+      <!-- Footer inyectado dinámicamente -->
+      <div id="footer-container"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR/EDITAR USUARIO -->
+  <div class="modal-overlay" id="usuario-modal">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 id="modal-usuario-title">Agregar Usuario</h3>
+        <button class="header-btn" onclick="document.getElementById('usuario-modal').classList.remove('open')">✕</button>
+      </div>
+      <form id="usuario-form">
+        <div class="modal-body">
+          <input type="hidden" id="usr-id">
+
+          <div class="form-group">
+            <label class="form-label" for="usr-nombre">Nombre Completo *</label>
+            <input type="text" id="usr-nombre" class="form-control" placeholder="Carlos García" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="usr-correo">Correo Electrónico *</label>
+            <input type="email" id="usr-correo" class="form-control" placeholder="carlos@empresa.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="usr-password" id="lbl-password">Contraseña *</label>
+            <input type="password" id="usr-password" class="form-control" placeholder="••••••••" required>
+            <small style="font-size: 10px; color: var(--text-tertiary);" id="help-password">Mínimo 6 caracteres.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="usr-rol">Rol del Usuario</label>
+            <select id="usr-rol" class="form-control">
+              <option value="empleado" selected>Empleado (Vendedor/Atención)</option>
+              <option value="administrador">Administrador (Gerente/Acceso total)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('usuario-modal').classList.remove('open')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts del sistema -->
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/usuarios.js"></script>
+</body>
+</html>

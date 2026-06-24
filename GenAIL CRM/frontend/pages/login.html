@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión — GenAIL CRM</title>
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/login.css">
+</head>
+<body>
+
+  <!-- Contenedor Principal del Login (Glassmorphism) -->
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-icon">G</div>
+        <span class="brand-text">GenAIL <span>CRM</span></span>
+      </div>
+
+      <!-- FORMULARIO DE LOGIN -->
+      <form id="login-form">
+        <h2 class="login-title">Bienvenido de nuevo</h2>
+        <p class="login-subtitle">Ingresa tus credenciales para acceder al sistema</p>
+
+        <div class="form-group">
+          <label class="form-label" for="login-correo">Correo Electrónico</label>
+          <input type="email" id="login-correo" class="form-control" placeholder="nombre@empresa.com" required>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label class="form-label" for="login-password">Contraseña</label>
+            <a href="#" id="toggle-recovery" class="forgot-link">¿Olvidaste tu contraseña?</a>
+          </div>
+          <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);">
+          Iniciar Sesión
+        </button>
+      </form>
+
+      <!-- FORMULARIO DE RECUPERACIÓN -->
+      <form id="recovery-form" style="display: none;">
+        <h2 class="login-title">Recuperar contraseña</h2>
+        <p class="login-subtitle">Ingresa tu correo y te enviaremos las instrucciones de restablecimiento</p>
+
+        <div class="form-group">
+          <label class="form-label" for="recovery-correo">Correo Electrónico</label>
+          <input type="email" id="recovery-correo" class="form-control" placeholder="nombre@empresa.com" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);">
+          Enviar Enlace
+        </button>
+
+        <div style="text-align: center; margin-top: var(--space-4);">
+          <a href="#" id="toggle-login" class="forgot-link">Regresar al Inicio de Sesión</a>
+        </div>
+      </form>
+
+      <!-- FORMULARIO DE RESTABLECER CONTRASEÑA -->
+      <form id="reset-password-form" style="display: none;">
+        <h2 class="login-title">Nueva contraseña</h2>
+        <p class="login-subtitle">Ingresa tu nueva contraseña para el sistema</p>
+
+        <div class="form-group">
+          <label class="form-label" for="reset-password-input">Nueva Contraseña</label>
+          <input type="password" id="reset-password-input" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--space-4);">
+          Guardar Contraseña
+        </button>
+
+        <div style="text-align: center; margin-top: var(--space-4);">
+          <a href="login.html" class="forgot-link">Cancelar y regresar al login</a>
+        </div>
+      </form>
+
+      <!-- SECCIÓN BOOTSTRAP INICIAL (Muestra si es la primera instalación) -->
+      <div id="bootstrap-section" style="display: none; margin-top: var(--space-6); border-top: 1px solid var(--border-color); padding-top: var(--space-4);">
+        <p class="bootstrap-text">🛡️ No hay usuarios registrados. Regístrate como el primer Administrador del sistema:</p>
+        <button id="btn-show-bootstrap" class="btn btn-secondary" style="width: 100%; margin-top: var(--space-2);">
+          Crear Cuenta de Administrador
+        </button>
+      </div>
+
+      <!-- FORMULARIO DE REGISTRO BOOTSTRAP -->
+      <form id="bootstrap-form" style="display: none;">
+        <h2 class="login-title">Crear Administrador</h2>
+        <p class="login-subtitle">Define las credenciales para la cuenta de administración inicial</p>
+
+        <div class="form-group">
+          <label class="form-label" for="boot-name">Nombre Completo</label>
+          <input type="text" id="boot-name" class="form-control" placeholder="Carlos García" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="boot-correo">Correo Electrónico</label>
+          <input type="email" id="boot-correo" class="form-control" placeholder="nombre@empresa.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="boot-password">Contraseña</label>
+          <input type="password" id="boot-password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-success" style="width: 100%; margin-top: var(--space-4);">
+          Registrar y Configurar
+        </button>
+
+        <div style="text-align: center; margin-top: var(--space-4);">
+          <a href="#" id="cancel-bootstrap" class="forgot-link">Regresar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/login.js"></script>
+</body>
+</html>

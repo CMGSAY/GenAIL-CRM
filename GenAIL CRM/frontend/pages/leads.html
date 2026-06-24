@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes Potenciales (Leads) — GenAIL CRM</title>
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+  <!-- Layout del Sistema -->
+  <div class="app-layout">
+    
+    <!-- Sidebar inyectado dinámicamente -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-wrapper">
+      
+      <!-- Header inyectado dinámicamente -->
+      <div id="header-container"></div>
+
+      <!-- Contenido Principal -->
+      <main class="main-content">
+        
+        <!-- Header de la sección -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1>Oportunidades de Venta (Leads)</h1>
+            <p>Controla el pipeline comercial, define productos de interés y clasifica tus negociaciones.</p>
+          </div>
+          <div>
+            <button id="btn-nuevo-lead" class="btn btn-primary">
+              <span>🎯</span> Registrar Oportunidad
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros y Pipeline Stage Cards -->
+        <div class="card" style="margin-bottom: var(--space-6); padding: var(--space-4);">
+          <div class="search-bar" style="justify-content: space-between;">
+            <div style="display: flex; gap: var(--space-3); flex-wrap: wrap;">
+              <select id="filter-lead-estado" class="form-control" style="width: 180px;">
+                <option value="">Todos los Estados</option>
+                <option value="nuevo">Nuevo</option>
+                <option value="contactado">Contactado</option>
+                <option value="en_negociacion">En Negociación</option>
+                <option value="ganado">Ganado</option>
+                <option value="perdido">Perdido</option>
+              </select>
+
+              <select id="filter-lead-interes" class="form-control" style="width: 180px;">
+                <option value="">Todos los Niveles</option>
+                <option value="bajo">Interés Bajo</option>
+                <option value="medio">Interés Medio</option>
+                <option value="alto">Interés Alto</option>
+              </select>
+
+              <button id="btn-reset-lead-filters" class="btn btn-secondary">
+                🔄 Limpiar
+              </button>
+            </div>
+            
+            <div style="font-size: var(--font-size-xs); color: var(--text-tertiary);" id="lead-pipeline-value">
+              Monto Estimado en Pipeline: Q0.00
+            </div>
+          </div>
+        </div>
+
+        <!-- Listado de Leads en Tarjetas / Grilla Kanban -->
+        <div class="table-container">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Producto de Interés</th>
+                <th>Valor Estimado</th>
+                <th>Nivel Interes</th>
+                <th>Estado Pipeline</th>
+                <th>Asignado A</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="leads-table-body">
+              <tr>
+                <td colspan="7" style="text-align: center; color: var(--text-tertiary); padding: var(--space-8);">
+                  Cargando oportunidades comerciales...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </main>
+
+      <!-- Footer inyectado dinámicamente -->
+      <div id="footer-container"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR NUEVO LEAD -->
+  <div class="modal-overlay" id="lead-modal">
+    <div class="modal-box" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3 id="modal-lead-title">Registrar Oportunidad</h3>
+        <button class="header-btn" onclick="document.getElementById('lead-modal').classList.remove('open')">✕</button>
+      </div>
+      <form id="lead-form">
+        <div class="modal-body">
+          <input type="hidden" id="lead-id">
+
+          <div class="form-group" id="select-cliente-group">
+            <label class="form-label" for="lead-select-cliente">Cliente Interesado *</label>
+            <select id="lead-select-cliente" class="form-control" required>
+              <option value="">-- Seleccione un cliente --</option>
+              <!-- Rellenado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lead-producto">Producto o Servicio de Interés *</label>
+            <input type="text" id="lead-producto" class="form-control" placeholder="Licencia ERP Corporativa" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="lead-nivel-interes">Nivel de Interés</label>
+              <select id="lead-nivel-interes" class="form-control">
+                <option value="bajo">Bajo</option>
+                <option value="medio" selected>Medio</option>
+                <option value="alto">Alto</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="lead-valor">Valor Estimado (Q)</label>
+              <input type="number" id="lead-valor" class="form-control" min="0" step="0.01" value="0.00">
+            </div>
+          </div>
+
+          <div class="form-row" id="assignee-row" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="lead-asignado">Asignado A</label>
+              <select id="lead-asignado" class="form-control">
+                <!-- Rellenado dinámicamente por JS si el rol es Admin -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="lead-notas">Notas / Comentarios comerciales</label>
+            <textarea id="lead-notas" class="form-control" rows="3" placeholder="Descripción de los requerimientos específicos del cliente, acuerdos previos o bitácora rápida de la negociación..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('lead-modal').classList.remove('open')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Oportunidad</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts del sistema -->
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/leads.js"></script>
+</body>
+</html>

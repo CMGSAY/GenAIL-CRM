@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario de Cliente — GenAIL CRM</title>
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+  <!-- Layout del Sistema -->
+  <div class="app-layout">
+    
+    <!-- Sidebar inyectado dinámicamente -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-wrapper">
+      
+      <!-- Header inyectado dinámicamente -->
+      <div id="header-container"></div>
+
+      <!-- Contenido Principal -->
+      <main class="main-content">
+        
+        <!-- Header de la sección -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 id="form-title">Registrar Nuevo Cliente</h1>
+            <p id="form-subtitle">Ingresa la información básica y de contacto del cliente.</p>
+          </div>
+          <div>
+            <a href="clientes.html" class="btn btn-secondary">
+              Volver al listado
+            </a>
+          </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="card" style="max-width: 800px; margin: 0 auto;">
+          <form id="cliente-form">
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="cliente-nombre">Nombre(s) *</label>
+                <input type="text" id="cliente-nombre" class="form-control" placeholder="Carlos" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cliente-apellidos">Apellido(s) *</label>
+                <input type="text" id="cliente-apellidos" class="form-control" placeholder="García Say" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="cliente-telefono">Teléfono</label>
+                <input type="tel" id="cliente-telefono" class="form-control" placeholder="+502 5555-5555">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="cliente-correo">Correo Electrónico</label>
+                <input type="email" id="cliente-correo" class="form-control" placeholder="carlos@empresa.com">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cliente-empresa">Empresa / Negocio</label>
+              <input type="text" id="cliente-empresa" class="form-control" placeholder="Corporación GenAIL o Particular">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="cliente-direccion">Dirección Física</label>
+              <input type="text" id="cliente-direccion" class="form-control" placeholder="Avenida Reforma 10-00, Zona 10, Guatemala">
+            </div>
+
+            <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: var(--space-5);">
+              * Los campos con asterisco son obligatorios. Recuerde que debe incluir al menos un medio de contacto (Teléfono o Correo).
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: var(--space-3); border-top: 1px solid var(--border-color); padding-top: var(--space-5);">
+              <a href="clientes.html" class="btn btn-secondary">Cancelar</a>
+              <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+            </div>
+
+          </form>
+        </div>
+
+      </main>
+
+      <!-- Footer inyectado dinámicamente -->
+      <div id="footer-container"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts del sistema -->
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/components.js"></script>
+  <script>
+    // Lógica rápida para cargar detalles si estamos editando
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const clienteId = urlParams.get('id');
+      const form = document.getElementById('cliente-form');
+      const title = document.getElementById('form-title');
+      const subtitle = document.getElementById('form-subtitle');
+
+      if (clienteId) {
+        title.textContent = 'Editar Cliente';
+        subtitle.textContent = 'Modifica los campos del cliente seleccionado.';
+        
+        try {
+          const res = await window.API.get(`/clientes/${clienteId}`);
+          if (res.success && res.data.cliente) {
+            const c = res.data.cliente;
+            document.getElementById('cliente-nombre').value = c.nombre || '';
+            document.getElementById('cliente-apellidos').value = c.apellidos || '';
+            document.getElementById('cliente-telefono').value = c.telefono || '';
+            document.getElementById('cliente-correo').value = c.correo || '';
+            document.getElementById('cliente-empresa').value = c.empresa || '';
+            document.getElementById('cliente-direccion').value = c.direccion || '';
+          }
+        } catch (err) {
+          window.showToast('Error al cargar datos del cliente', 'error');
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const nombre = document.getElementById('cliente-nombre').value.trim();
+        const apellidos = document.getElementById('cliente-apellidos').value.trim();
+        const telefono = document.getElementById('cliente-telefono').value.trim();
+        const correo = document.getElementById('cliente-correo').value.trim();
+        const empresa = document.getElementById('cliente-empresa').value.trim();
+        const direccion = document.getElementById('cliente-direccion').value.trim();
+
+        // Validar que al menos uno de los medios de contacto exista
+        if (!telefono && !correo) {
+          window.showToast('Debe proporcionar al menos un medio de contacto (Teléfono o Correo)', 'error');
+          return;
+        }
+
+        const payload = { nombre, apellidos, telefono, correo, empresa, direccion };
+
+        try {
+          let res;
+          if (clienteId) {
+            res = await window.API.put(`/clientes/${clienteId}`, payload);
+          } else {
+            res = await window.API.post('/clientes', payload);
+          }
+
+          if (res.success) {
+            window.showToast(clienteId ? 'Cliente actualizado exitosamente' : 'Cliente registrado exitosamente', 'success');
+            setTimeout(() => {
+              window.location.href = 'clientes.html';
+            }, 1000);
+          }
+        } catch (err) {
+          window.showToast(err.message, 'error');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

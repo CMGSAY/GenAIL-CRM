@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Ejecutivo — GenAIL CRM</title>
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  
+  <!-- Chart.js CDN para gráficos interactivos vectoriales -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Layout del Sistema -->
+  <div class="app-layout">
+    
+    <!-- Sidebar inyectado dinámicamente -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-wrapper">
+      
+      <!-- Header inyectado dinámicamente -->
+      <div id="header-container"></div>
+
+      <!-- Contenido Principal -->
+      <main class="main-content">
+        
+        <!-- Header de la sección -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1>Dashboard Ejecutivo</h1>
+            <p>Resumen analítico y estadísticas de rendimiento comercial en tiempo real.</p>
+          </div>
+          <div>
+            <button id="btn-refresh-dashboard" class="btn btn-secondary">
+              🔄 Actualizar Datos
+            </button>
+          </div>
+        </div>
+
+        <!-- Módulo de aviso de rol (Si es empleado, ocultar dashboard analítico con gracia) -->
+        <div id="employee-warning-card" class="card" style="display: none; text-align: center; padding: var(--space-8);">
+          <div style="font-size: var(--font-size-4xl); margin-bottom: var(--space-4);">🔒</div>
+          <h2>Acceso Restringido</h2>
+          <p style="margin-top: var(--space-2); margin-bottom: var(--space-4);">El Dashboard Ejecutivo analítico y de estadísticas agregadas de ventas es exclusivo para Administradores.</p>
+          <a href="clientes.html" class="btn btn-primary">Ir a Gestión de Clientes</a>
+        </div>
+
+        <!-- CONTENIDO DEL DASHBOARD (Solo visible para Admin) -->
+        <div id="dashboard-admin-view" style="display: none;">
+          
+          <!-- Grid de Tarjetas KPI -->
+          <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-8);">
+            
+            <div class="card card-kpi">
+              <div class="kpi-header">
+                <span class="kpi-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--primary-400);">👤</span>
+                <span class="kpi-label">Clientes Activos</span>
+              </div>
+              <div class="kpi-value" id="kpi-clientes-totales">0</div>
+              <div class="kpi-footer" id="kpi-clientes-nuevos">+0 este mes</div>
+            </div>
+
+            <div class="card card-kpi">
+              <div class="kpi-header">
+                <span class="kpi-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--success-text);">💰</span>
+                <span class="kpi-label">Ventas Registradas</span>
+              </div>
+              <div class="kpi-value" id="kpi-ventas-totales">Q0.00</div>
+              <div class="kpi-footer">Ingresos brutos acumulados</div>
+            </div>
+
+            <div class="card card-kpi">
+              <div class="kpi-header">
+                <span class="kpi-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--warning-text);">🎯</span>
+                <span class="kpi-label">Clientes Potenciales</span>
+              </div>
+              <div class="kpi-value" id="kpi-clientes-potenciales">0</div>
+              <div class="kpi-footer">Negociaciones en pipeline</div>
+            </div>
+
+            <div class="card card-kpi">
+              <div class="kpi-header">
+                <span class="kpi-icon" style="background: rgba(239, 68, 68, 0.12); color: var(--danger-text);">📞</span>
+                <span class="kpi-label">Seguimientos Pendientes</span>
+              </div>
+              <div class="kpi-value" id="kpi-seguimientos-pendientes">0</div>
+              <div class="kpi-footer">Tareas de contacto atrasadas</div>
+            </div>
+
+          </div>
+
+          <!-- Gráficos -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6); margin-bottom: var(--space-6);">
+            
+            <!-- Ventas Mensuales (Línea) -->
+            <div class="card">
+              <h3 style="margin-bottom: var(--space-4);">📊 Facturación Mensual (GTQ)</h3>
+              <div style="position: relative; height: 280px;">
+                <canvas id="chart-ventas-mensuales"></canvas>
+              </div>
+            </div>
+
+            <!-- Segmentos Clientes (Dona) -->
+            <div class="card">
+              <h3 style="margin-bottom: var(--space-4);">🍰 Distribución de Clientes</h3>
+              <div style="position: relative; height: 280px; display: flex; justify-content: center;">
+                <canvas id="chart-clientes-categoria"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr; gap: var(--space-6);">
+            <!-- Crecimiento Clientes (Barras) -->
+            <div class="card">
+              <h3 style="margin-bottom: var(--space-4);">📈 Adquisición de Clientes Nuevos</h3>
+              <div style="position: relative; height: 280px;">
+                <canvas id="chart-clientes-crecimiento"></canvas>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- Footer inyectado dinámicamente -->
+      <div id="footer-container"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts del sistema -->
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/dashboard.js"></script>
+</body>
+</html>

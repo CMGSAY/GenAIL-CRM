@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguimiento Comercial — GenAIL CRM</title>
+  
+  <!-- Estilos del Sistema -->
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+</head>
+<body>
+
+  <!-- Layout del Sistema -->
+  <div class="app-layout">
+    
+    <!-- Sidebar inyectado dinámicamente -->
+    <div id="sidebar-container"></div>
+
+    <div class="main-wrapper">
+      
+      <!-- Header inyectado dinámicamente -->
+      <div id="header-container"></div>
+
+      <!-- Contenido Principal -->
+      <main class="main-content">
+        
+        <!-- Header de la sección -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1>Seguimiento Comercial</h1>
+            <p>Registra reuniones, llamadas o mensajes con tus clientes, y programa alertas de próximas acciones.</p>
+          </div>
+          <div>
+            <button id="btn-nuevo-seguimiento" class="btn btn-primary">
+              <span>📞</span> Registrar Actividad
+            </button>
+          </div>
+        </div>
+
+        <!-- Dos secciones: Recordatorios e Historial por Cliente -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); flex-wrap: wrap;">
+          
+          <!-- SECCIÓN IZQUIERDA: RECORDATORIOS PENDIENTES -->
+          <div>
+            <h3 style="margin-bottom: var(--space-4);">⚠️ Mis Próximas Acciones Pendientes</h3>
+            <div id="pendientes-container" style="display: flex; flex-direction: column; gap: var(--space-4); max-height: 500px; overflow-y: auto;">
+              <!-- Rellenado por JS -->
+              <div class="card" style="text-align: center; color: var(--text-tertiary); padding: var(--space-6);">
+                Cargando pendientes...
+              </div>
+            </div>
+          </div>
+
+          <!-- SECCIÓN DERECHA: HISTORIAL DE INTERACCIONES POR CLIENTE -->
+          <div>
+            <h3 style="margin-bottom: var(--space-4);">📜 Historial Comercial de Interacciones</h3>
+            
+            <div class="card" style="margin-bottom: var(--space-4); padding: var(--space-4);">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="select-cliente-historial">Seleccionar Cliente para Consultar</label>
+                <select id="select-cliente-historial" class="form-control">
+                  <option value="">-- Seleccione un cliente --</option>
+                  <!-- Rellenado por JS -->
+                </select>
+              </div>
+            </div>
+
+            <div id="historial-interacciones-container" style="display: flex; flex-direction: column; gap: var(--space-4); max-height: 380px; overflow-y: auto;">
+              <div class="card" style="text-align: center; color: var(--text-tertiary); padding: var(--space-6);">
+                Seleccione un cliente para cargar su historial de interacciones.
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- Footer inyectado dinámicamente -->
+      <div id="footer-container"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR NUEVA INTERACCIÓN -->
+  <div class="modal-overlay" id="seguimiento-modal">
+    <div class="modal-box" style="max-width: 550px;">
+      <div class="modal-header">
+        <h3>Registrar Interacción</h3>
+        <button class="header-btn" onclick="document.getElementById('seguimiento-modal').classList.remove('open')">✕</button>
+      </div>
+      <form id="seguimiento-form">
+        <div class="modal-body">
+          
+          <div class="form-group">
+            <label class="form-label" for="seg-select-cliente">Cliente *</label>
+            <select id="seg-select-cliente" class="form-control" required>
+              <option value="">-- Seleccione un cliente --</option>
+              <!-- Rellenado dinámicamente -->
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="seg-tipo">Tipo de Interacción *</label>
+              <select id="seg-tipo" class="form-control" required>
+                <option value="llamada">Llamada telefónica</option>
+                <option value="mensaje">Mensaje (WhatsApp / SMS)</option>
+                <option value="correo">Correo electrónico</option>
+                <option value="reunion">Reunión presencial / virtual</option>
+                <option value="visita">Visita física a cliente</option>
+                <option value="otro">Otro medio</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="seg-fecha">Fecha del Evento</label>
+              <input type="datetime-local" id="seg-fecha" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="seg-desc">Resumen de la Interacción *</label>
+            <textarea id="seg-desc" class="form-control" rows="3" placeholder="Detalla los puntos clave conversados, acuerdos logrados o quejas recibidas..." required></textarea>
+          </div>
+
+          <div style="margin-top: var(--space-4); border-top: 1px dashed var(--border-color); padding-top: var(--space-4);">
+            <h4 style="font-size: var(--font-size-sm); color: var(--text-secondary); margin-bottom: var(--space-3);">📅 Programar Siguiente Acción (Recordatorio)</h4>
+            
+            <div class="form-group">
+              <label class="form-label" for="seg-proxima">Próxima Acción</label>
+              <input type="text" id="seg-proxima" class="form-control" placeholder="Ej: Enviar cotización actualizada o llamar para confirmar entrega">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="seg-fecha-proxima">Fecha Límite</label>
+              <input type="date" id="seg-fecha-proxima" class="form-control">
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('seguimiento-modal').classList.remove('open')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar Evento</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts del sistema -->
+  <script src="../js/config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/components.js"></script>
+  <script src="../js/seguimientos.js"></script>
+</body>
+</html>
