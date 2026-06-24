@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Variables de Estado
   let clientesMap = {}; // Mapa rápido para consultar datos de clientes localmente
+  let allClientes = []; // Guardar lista original de todos los clientes activos
 
   // Inicializar cargando clientes
   cargarSelectorClientes();
@@ -44,19 +45,45 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await window.API.get('/clientes?limit=100&estado=activo');
       if (res.success && res.data.clientes) {
-        selectCliente.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
-        res.data.clientes.forEach(c => {
+        allClientes = res.data.clientes;
+        allClientes.forEach(c => {
           clientesMap[c._id] = c;
-          const option = document.createElement('option');
-          option.value = c._id;
-          option.textContent = `${c.nombre} ${c.apellidos} (${c.empresa || 'Particular'})`;
-          selectCliente.appendChild(option);
         });
+        renderSelector(allClientes);
       }
     } catch (err) {
       window.showToast('Error al cargar la lista de clientes', 'error');
     }
   }
+
+  function renderSelector(lista) {
+    if (!selectCliente) return;
+    selectCliente.innerHTML = '<option value="">-- Seleccione un cliente --</option>';
+    lista.forEach(c => {
+      const option = document.createElement('option');
+      option.value = c._id;
+      const correoText = c.correo ? ` - ${c.correo}` : '';
+      option.textContent = `${c.nombre} ${c.apellidos} (${c.empresa || 'Particular'})${correoText}`;
+      selectCliente.appendChild(option);
+    });
+  }
+
+  // --- Buscador y Filtro Local ---
+  const buscarClienteInput = document.getElementById('buscar-cliente-input');
+  buscarClienteInput?.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (!query) {
+      renderSelector(allClientes);
+      return;
+    }
+    const filtered = allClientes.filter(c => {
+      const nombreCompleto = `${c.nombre} ${c.apellidos}`.toLowerCase();
+      const correo = (c.correo || '').toLowerCase();
+      const empresa = (c.empresa || '').toLowerCase();
+      return nombreCompleto.includes(query) || correo.includes(query) || empresa.includes(query);
+    });
+    renderSelector(filtered);
+  });
 
   // --- Cambio de Cliente Seleccionado ---
   selectCliente?.addEventListener('change', async (e) => {

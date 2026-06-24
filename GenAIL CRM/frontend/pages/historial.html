@@ -40,12 +40,18 @@
 
         <!-- Selector de Cliente -->
         <div class="card" style="margin-bottom: var(--space-6);">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="select-cliente">Seleccionar Cliente para Consultar</label>
-            <select id="select-cliente" class="form-control">
-              <option value="">-- Seleccione un cliente --</option>
-              <!-- Rellenado por JS -->
-            </select>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-4);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="buscar-cliente-input">Buscar Cliente (Nombre, Correo o Empresa)</label>
+              <input type="text" id="buscar-cliente-input" class="form-control" placeholder="Escribe para filtrar la lista...">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="select-cliente">Seleccionar Cliente para Consultar</label>
+              <select id="select-cliente" class="form-control">
+                <option value="">-- Seleccione un cliente --</option>
+                <!-- Rellenado por JS -->
+              </select>
+            </div>
           </div>
         </div>
 
