@@ -108,6 +108,8 @@ function injectLayout() {
   }
 
   // 2. Header HTML
+  if (headerContainer) {
+    const pageTitle = getPageTitleByPath(currentPath);
     headerContainer.innerHTML = `
       <header class="header">
         <div class="header-left">
@@ -150,8 +152,8 @@ function injectLayout() {
 
     notifBtn?.addEventListener('click', (e) => {
       e.stopPropagation();
-      notifPanel.classList.toggle('open');
-      if (notifPanel.classList.contains('open')) {
+      notifPanel?.classList.toggle('open');
+      if (notifPanel?.classList.contains('open')) {
         cargarNotificacionesTray();
       }
     });
@@ -182,6 +184,7 @@ function injectLayout() {
       menuToggle.addEventListener('click', toggleMenu);
       overlay.addEventListener('click', toggleMenu);
     }
+  }
 
   // 3. Footer HTML
   if (footerContainer) {
