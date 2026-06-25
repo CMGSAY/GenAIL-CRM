@@ -99,7 +99,15 @@
             
             <!-- Ventas Mensuales (Línea) -->
             <div class="card">
-              <h3 style="margin-bottom: var(--space-4);">📊 Facturación Mensual (GTQ)</h3>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); flex-wrap: wrap; gap: var(--space-2);">
+                <h3 id="titulo-ventas-agrupadas" style="margin-bottom: 0;">📊 Facturación Mensual (GTQ)</h3>
+                <select id="filter-ventas-grupo" class="form-control" style="width: auto; padding: var(--space-1) var(--space-3); font-size: var(--font-size-sm); margin-bottom: 0; height: auto;">
+                  <option value="mes" selected>Por Mes</option>
+                  <option value="dia">Por Día</option>
+                  <option value="semana">Por Semana</option>
+                  <option value="anio">Por Año</option>
+                </select>
+              </div>
               <div style="position: relative; height: 280px;">
                 <canvas id="chart-ventas-mensuales"></canvas>
               </div>

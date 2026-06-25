@@ -51,6 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Actualizar
   btnRefresh?.addEventListener('click', cargarDashboard);
 
+  // Filtro de agrupación de ventas
+  const filterVentasGrupo = document.getElementById('filter-ventas-grupo');
+  filterVentasGrupo?.addEventListener('change', async (e) => {
+    try {
+      const agrupar = e.target.value;
+      const ventasRes = await window.API.get(`/dashboard/ventas-mensuales?agrupar=${agrupar}`);
+      if (ventasRes.success) {
+        renderGraficoVentas(ventasRes.data.ventas, agrupar);
+      }
+    } catch (err) {
+      window.showToast('Error al actualizar gráfico de ventas: ' + err.message, 'error');
+    }
+  });
+
   // --- Cargar Dashboard (KPIs + Gráficos) ---
   async function cargarDashboard() {
     try {
@@ -66,9 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // 2. Gráfico: Ventas Mensuales
-      const ventasRes = await window.API.get('/dashboard/ventas-mensuales');
+      const agrupar = document.getElementById('filter-ventas-grupo')?.value || 'mes';
+      const ventasRes = await window.API.get(`/dashboard/ventas-mensuales?agrupar=${agrupar}`);
       if (ventasRes.success) {
-        renderGraficoVentas(ventasRes.data.ventas);
+        renderGraficoVentas(ventasRes.data.ventas, agrupar);
       }
 
       // 3. Gráfico: Clientes por Categoría
@@ -105,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // --- Renderizar Gráfico: Ventas Mensuales (Línea) ---
-  function renderGraficoVentas(ventas) {
+  function renderGraficoVentas(ventas, agrupar = 'mes') {
     const ctx = document.getElementById('chart-ventas-mensuales').getContext('2d');
     
     if (chartVentas) chartVentas.destroy();
@@ -113,12 +128,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const labels = ventas.map(v => v.mes);
     const data = ventas.map(v => v.monto);
 
+    // Mapear títulos y leyendas según el tipo de agrupación
+    let labelTitulo = 'Monto de Ventas Mensuales (Q)';
+    let textoCabecera = '📊 Facturación Mensual (GTQ)';
+
+    if (agrupar === 'dia') {
+      labelTitulo = 'Monto de Ventas Diarias (Q)';
+      textoCabecera = '📊 Facturación Diaria (GTQ)';
+    } else if (agrupar === 'semana') {
+      labelTitulo = 'Monto de Ventas Semanales (Q)';
+      textoCabecera = '📊 Facturación Semanal (GTQ)';
+    } else if (agrupar === 'anio') {
+      labelTitulo = 'Monto de Ventas Anuales (Q)';
+      textoCabecera = '📊 Facturación Anual (GTQ)';
+    }
+
+    const tituloHeader = document.getElementById('titulo-ventas-agrupadas');
+    if (tituloHeader) {
+      tituloHeader.textContent = textoCabecera;
+    }
+
     chartVentas = new Chart(ctx, {
       type: 'line',
       data: {
         labels,
         datasets: [{
-          label: 'Monto de Ventas (Q)',
+          label: labelTitulo,
           data,
           borderColor: '#6366f1', // Primary color
           backgroundColor: 'rgba(99, 102, 241, 0.1)',

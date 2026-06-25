@@ -76,31 +76,74 @@ const obtenerIndicadores = async (req, res) => {
  */
 const obtenerVentasMensuales = async (req, res) => {
   try {
+    const { agrupar } = req.query; // 'dia', 'semana', 'mes', 'anio' (default 'mes')
+
+    let groupFields = {};
+    let sortFields = {};
+    
+    if (agrupar === 'dia') {
+      groupFields = {
+        year: { $year: '$fecha' },
+        month: { $month: '$fecha' },
+        day: { $dayOfMonth: '$fecha' }
+      };
+      sortFields = { '_id.year': 1, '_id.month': 1, '_id.day': 1 };
+    } else if (agrupar === 'semana') {
+      groupFields = {
+        year: { $year: '$fecha' },
+        week: { $week: '$fecha' }
+      };
+      sortFields = { '_id.year': 1, '_id.week': 1 };
+    } else if (agrupar === 'anio') {
+      groupFields = {
+        year: { $year: '$fecha' }
+      };
+      sortFields = { '_id.year': 1 };
+    } else {
+      // Default: 'mes'
+      groupFields = {
+        year: { $year: '$fecha' },
+        month: { $month: '$fecha' }
+      };
+      sortFields = { '_id.year': 1, '_id.month': 1 };
+    }
+
     const ventas = await Compra.aggregate([
       {
         $group: {
-          _id: {
-            year: { $year: '$fecha' },
-            month: { $month: '$fecha' }
-          },
+          _id: groupFields,
           total: { $sum: '$montoTotal' },
           count: { $sum: 1 }
         }
       },
-      { $sort: { '_id.year': 1, '_id.month': 1 } }
+      { $sort: sortFields }
     ]);
 
-    // Formatear respuesta para el gráfico
     const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    const resultado = ventas.map(v => ({
-      mes: `${meses[v._id.month - 1]} ${v._id.year}`,
-      monto: v.total,
-      cantidad: v.count
-    }));
+    const resultado = ventas.map(v => {
+      let etiqueta = '';
+      if (agrupar === 'dia') {
+        const dia = String(v._id.day).padStart(2, '0');
+        const mes = String(v._id.month).padStart(2, '0');
+        etiqueta = `${dia}/${mes}/${v._id.year}`;
+      } else if (agrupar === 'semana') {
+        etiqueta = `Sem ${v._id.week} - ${v._id.year}`;
+      } else if (agrupar === 'anio') {
+        etiqueta = `${v._id.year}`;
+      } else {
+        // 'mes'
+        etiqueta = `${meses[v._id.month - 1]} ${v._id.year}`;
+      }
+      return {
+        mes: etiqueta, // keep the key mes to prevent breaking changes in JS
+        monto: v.total,
+        cantidad: v.count
+      };
+    });
 
     res.json({
       success: true,
-      message: 'Ventas mensuales obtenidas',
+      message: 'Ventas obtenidas exitosamente',
       data: { ventas: resultado }
     });
   } catch (error) {
