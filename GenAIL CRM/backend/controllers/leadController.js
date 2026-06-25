@@ -112,6 +112,12 @@ const obtenerLeads = async (req, res) => {
         const gastoB = b.clienteId?.totalCompras || 0;
         return gastoB - gastoA;
       });
+    } else if (ordenar === 'cliente_gasto_asc') {
+      leadsList.sort((a, b) => {
+        const gastoA = a.clienteId?.totalCompras || 0;
+        const gastoB = b.clienteId?.totalCompras || 0;
+        return gastoA - gastoB;
+      });
     } else {
       // Orden por defecto: Fecha de creación descendente
       leadsList.sort((a, b) => b.createdAt - a.createdAt);

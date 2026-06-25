@@ -156,8 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
     leads.forEach(l => {
       const row = document.createElement('tr');
 
+      const gastoAcumulado = l.clienteId && l.clienteId.totalCompras !== undefined
+        ? `<br><span style="font-size: var(--font-size-xs); color: var(--success-text); font-weight: 600;">Gasto: Q${l.clienteId.totalCompras.toLocaleString('es-GT', { minimumFractionDigits: 2 })}</span>`
+        : '';
+
       const cliente = l.clienteId
-        ? `${l.clienteId.nombre} ${l.clienteId.apellidos}<br><span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">${l.clienteId.empresa || 'Particular'}</span>`
+        ? `${l.clienteId.nombre} ${l.clienteId.apellidos}<br><span style="font-size: var(--font-size-xs); color: var(--text-tertiary);">${l.clienteId.empresa || 'Particular'}</span>${gastoAcumulado}`
         : '<span style="color: var(--text-tertiary); font-style: italic;">Sin cliente</span>';
 
       const valor = `Q${l.valorEstimado.toLocaleString('es-GT', { minimumFractionDigits: 2 })}`;
