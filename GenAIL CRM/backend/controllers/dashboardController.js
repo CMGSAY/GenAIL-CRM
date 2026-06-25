@@ -120,7 +120,7 @@ const obtenerVentasMensuales = async (req, res) => {
 const obtenerClientesPorCategoria = async (req, res) => {
   try {
     const dist = await Cliente.aggregate([
-      { $match: { estado: 'activo' } },
+      { $match: { estado: 'activo', categoria: { $ne: 'inactivo' } } },
       { $group: { _id: '$categoria', count: { $sum: 1 } } }
     ]);
 
@@ -128,8 +128,7 @@ const obtenerClientesPorCategoria = async (req, res) => {
     const resultado = {
       premium: 0,
       frecuente: 0,
-      potencial: 0,
-      inactivo: 0
+      potencial: 0
     };
 
     dist.forEach(d => {

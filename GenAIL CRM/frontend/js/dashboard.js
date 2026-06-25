@@ -155,14 +155,13 @@ document.addEventListener('DOMContentLoaded', () => {
     chartCategorias = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Premium', 'Frecuente', 'Potencial', 'Inactivo'],
+        labels: ['Premium', 'Frecuente', 'Potencial'],
         datasets: [{
-          data: [dist.premium, dist.frecuente, dist.potencial, dist.inactivo],
+          data: [dist.premium, dist.frecuente, dist.potencial],
           backgroundColor: [
             '#10b981', // Premium (Green)
             '#6366f1', // Frecuente (Indigo)
-            '#fbbf24', // Potencial (Yellow)
-            '#ef4444'  // Inactivo (Red)
+            '#fbbf24'  // Potencial (Yellow)
           ],
           borderColor: '#1e293b', // Match card background
           borderWidth: 2
