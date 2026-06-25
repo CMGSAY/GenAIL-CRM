@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tableBody = document.getElementById('leads-table-body');
   const filterEstado = document.getElementById('filter-lead-estado');
   const filterInteres = document.getElementById('filter-lead-interes');
+  const sortLead = document.getElementById('sort-lead');
   const btnResetFilters = document.getElementById('btn-reset-lead-filters');
   const pipelineValueText = document.getElementById('lead-pipeline-value');
 
@@ -52,10 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Filtros ---
   filterEstado?.addEventListener('change', cargarLeads);
   filterInteres?.addEventListener('change', cargarLeads);
+  sortLead?.addEventListener('change', cargarLeads);
   
   btnResetFilters?.addEventListener('click', () => {
     if (filterEstado) filterEstado.value = '';
     if (filterInteres) filterInteres.value = '';
+    if (sortLead) sortLead.value = '';
     cargarLeads();
   });
 
@@ -111,10 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const estado = filterEstado?.value || '';
       const nivelInteres = filterInteres?.value || '';
+      const ordenar = sortLead?.value || '';
 
       const queryParams = new URLSearchParams();
       if (estado) queryParams.append('estado', estado);
       if (nivelInteres) queryParams.append('nivelInteres', nivelInteres);
+      if (ordenar) queryParams.append('ordenar', ordenar);
 
       const res = await window.API.get(`/leads?${queryParams.toString()}`);
 
@@ -261,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     selectClienteGroup.style.display = 'block';
     
     // Resetear formulario
+    leadSelectCliente.setAttribute('required', 'required');
     leadSelectCliente.value = '';
     leadProducto.value = '';
     leadNivelInteres.value = 'medio';
@@ -282,6 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Al editar no dejamos cambiar de cliente para preservar integridad
         selectClienteGroup.style.display = 'none';
+        leadSelectCliente.removeAttribute('required');
+        if (l.clienteId) {
+          leadSelectCliente.value = l.clienteId._id || l.clienteId;
+        }
 
         leadProducto.value = l.productoInteres;
         leadNivelInteres.value = l.nivelInteres;

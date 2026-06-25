@@ -83,7 +83,7 @@ const crearLead = async (req, res) => {
  */
 const obtenerLeads = async (req, res) => {
   try {
-    const { estado, nivelInteres, asignadoA } = req.query;
+    const { estado, nivelInteres, asignadoA, ordenar } = req.query;
 
     const query = {};
 
@@ -100,15 +100,27 @@ const obtenerLeads = async (req, res) => {
     }
 
     const leads = await Lead.find(query)
-      .populate('clienteId', 'nombre apellidos empresa correo telefono')
+      .populate('clienteId', 'nombre apellidos empresa correo telefono totalCompras')
       .populate('asignadoA', 'nombre correo')
-      .populate('creadoPor', 'nombre')
-      .sort({ createdAt: -1 });
+      .populate('creadoPor', 'nombre');
+
+    let leadsList = [...leads];
+
+    if (ordenar === 'cliente_gasto') {
+      leadsList.sort((a, b) => {
+        const gastoA = a.clienteId?.totalCompras || 0;
+        const gastoB = b.clienteId?.totalCompras || 0;
+        return gastoB - gastoA;
+      });
+    } else {
+      // Orden por defecto: Fecha de creación descendente
+      leadsList.sort((a, b) => b.createdAt - a.createdAt);
+    }
 
     res.json({
       success: true,
       message: 'Leads obtenidos exitosamente',
-      data: { leads }
+      data: { leads: leadsList }
     });
   } catch (error) {
     res.status(500).json({
